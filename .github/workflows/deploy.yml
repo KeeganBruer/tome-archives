@@ -17,9 +17,6 @@ concurrency:
 
 jobs:
   build:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -33,13 +30,9 @@ jobs:
           cache-dependency-path: 'package-lock.json'
 
       - name: Install dependencies
-        run: |
-          echo ${{ env.NEXT_PUBLIC_BASE_PATH }}
-          npm install
+        run: npm install
 
       - name: Build static site
-        env:
-          NEXT_PUBLIC_BASE_PATH: ${{ env.NEXT_PUBLIC_BASE_PATH }}
         run: |
           echo ${{ env.NEXT_PUBLIC_BASE_PATH }}
           npm run build
