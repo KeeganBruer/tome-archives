@@ -33,9 +33,15 @@ jobs:
           cache-dependency-path: 'package-lock.json'
 
       - name: Install dependencies
-        run: npm install
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ NEXT_PUBLIC_BASE_PATH }}
+        run: |
+          echo "$NEXT_PUBLIC_BASE_PATH"
+          npm install
 
       - name: Build static site
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ NEXT_PUBLIC_BASE_PATH }}
         run: |
           echo "$NEXT_PUBLIC_BASE_PATH"
           npm run build
