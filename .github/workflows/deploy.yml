@@ -34,14 +34,14 @@ jobs:
 
       - name: Install dependencies
         env:
-          NEXT_PUBLIC_BASE_PATH: ${{ NEXT_PUBLIC_BASE_PATH }}
+          NEXT_PUBLIC_BASE_PATH: ${{ env.NEXT_PUBLIC_BASE_PATH }}
         run: |
           echo "$NEXT_PUBLIC_BASE_PATH"
           npm install
 
       - name: Build static site
         env:
-          NEXT_PUBLIC_BASE_PATH: ${{ NEXT_PUBLIC_BASE_PATH }}
+          NEXT_PUBLIC_BASE_PATH: ${{ env.NEXT_PUBLIC_BASE_PATH }}
         run: |
           echo "$NEXT_PUBLIC_BASE_PATH"
           npm run build
