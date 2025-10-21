@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FileArchive, Edit, Eye, FileCode, Package, Layers, CheckCircle, BookOpen, FileImage } from 'lucide-react';
+import { FileArchive, Edit, Eye, FileCode, Package, Layers, CheckCircle, BookOpen, FileImage, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Home() {
@@ -350,10 +350,10 @@ export default function Home() {
 
         {/* Tools Section */}
         <section className="container mx-auto px-4 py-16">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <h3 className="text-2xl font-bold mb-8 text-center">Available Tools</h3>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               {/* Editor Card */}
               <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
                 <div className="p-6 space-y-4">
@@ -443,6 +443,53 @@ export default function Home() {
                   <Link href="/tools/viewer">
                     <Button className="w-full">
                       Open Viewer
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* CBZ Converter Card */}
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
+                <div className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="h-12 w-12 rounded-lg bg-blue-500 flex items-center justify-center">
+                      <Zap className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-500 text-xs font-medium">
+                      Available
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xl font-semibold mb-2">CBZ Converter</h4>
+                    <p className="text-muted-foreground">
+                      Convert CBZ (comic book archive) files to .tome format with
+                      comprehensive metadata support for comic chapters, volumes, and series.
+                    </p>
+                  </div>
+
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Multi-type support (chapter, volume, series)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Drag-and-drop file upload</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Configure rich metadata during conversion</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Live preview before download</span>
+                    </li>
+                  </ul>
+
+                  <Link href="/tools/converters/cbz">
+                    <Button className="w-full">
+                      Open Converter
                     </Button>
                   </Link>
                 </div>

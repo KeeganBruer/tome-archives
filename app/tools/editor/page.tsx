@@ -16,6 +16,7 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useToast } from '@/components/ui/toast';
 import { prettifyJson } from '@/lib/utils';
 import { saveTomeToStorage } from '@/lib/tomeStorage';
+import { getAbsoluteUrl } from '@/lib/pathUtils';
 
 export default function Home() {
   const {
@@ -167,8 +168,9 @@ export default function Home() {
       // Save to IndexedDB
       await saveTomeToStorage(currentZip, filename);
 
-      // Open viewer in new tab
-      window.open('/tools/viewer', '_blank');
+      // Open viewer in new tab with basePath support
+      const viewerUrl = getAbsoluteUrl('/tools/viewer');
+      window.open(viewerUrl, '_blank');
 
       showToast('Opening preview...', 'success');
     } catch (error) {
