@@ -17,6 +17,7 @@ import { useToast } from '@/components/ui/toast';
 import { prettifyJson } from '@/lib/utils';
 import { saveTomeToStorage } from '@/lib/tomeStorage';
 import { getAbsoluteUrl } from '@/lib/pathUtils';
+import Link from 'next/link';
 
 export default function Home() {
   const {
@@ -195,9 +196,11 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-lg">T</span>
-                </div>
+                <Link href={`/tools`}>
+                  <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                    <span className="text-primary-foreground font-bold text-lg">T</span>
+                  </div>
+                </Link>
                 <h1 className="text-2xl font-bold">Tome Editor</h1>
               </div>
               {filename && !isRenamingFile ? (

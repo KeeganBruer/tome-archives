@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeft,Archive, FileCode, FolderTree, Link as LinkIcon, ChevronRight, BookOpen, FileImage, Headphones, BookImage, Menu, X } from 'lucide-react';
+import { ArrowLeft,Archive, FileCode, FolderTree, Link as LinkIcon, ChevronRight, BookOpen, FileImage, Headphones, BookImage, Menu, X, BookMarked } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function StandardsLayout({
@@ -62,6 +62,20 @@ export default function StandardsLayout({
 
         {typesExpanded && (
           <div className="ml-6 mt-1 space-y-1">
+            <Link href="/standards/types/epub">
+              <button
+                className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+                  isActive('/standards/types/epub')
+                    ? 'bg-primary text-primary-foreground'
+                    : 'hover:bg-accent'
+                }`}
+                onClick={() => setIsMobileSidebarOpen(false)}
+              >
+                <BookMarked className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="text-sm">epub</span>
+              </button>
+            </Link>
+
             <Link href="/standards/types/book">
               <button
                 className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
@@ -133,20 +147,49 @@ export default function StandardsLayout({
             </Link>
           </div>
         )}
-        {/* Replacing CBZ*/}
-        <Link href="/standards/cbz">
+        {/* Format Conversion Guides - Expandable */}
+        <div className="mt-2">
           <button
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
-              isActive('/standards/cbz')
-                ? 'bg-primary text-primary-foreground'
-                : 'hover:bg-accent'
-            }`}
-            onClick={() => setIsMobileSidebarOpen(false)}
+            onClick={() => setTypesExpanded(!typesExpanded)}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-accent transition-colors"
           >
-            <Archive className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium">Replacing CBZs</span>
+            <FileCode className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm font-medium flex-1 text-left">Format Conversion</span>
+            <ChevronRight className={`h-4 w-4 transition-transform ${typesExpanded ? 'rotate-90' : ''}`} />
           </button>
-        </Link>
+
+          {typesExpanded && (
+            <div className="ml-6 mt-1 space-y-1">
+              <Link href="/standards/cbz">
+                <button
+                  className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+                    isActive('/standards/cbz')
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-accent'
+                  }`}
+                  onClick={() => setIsMobileSidebarOpen(false)}
+                >
+                  <Archive className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span className="text-sm">Replacing CBZs</span>
+                </button>
+              </Link>
+
+              <Link href="/standards/epub-converting">
+                <button
+                  className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+                    isActive('/standards/epub-converting')
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-accent'
+                  }`}
+                  onClick={() => setIsMobileSidebarOpen(false)}
+                >
+                  <BookMarked className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span className="text-sm">Replacing EPUBs</span>
+                </button>
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
@@ -158,9 +201,11 @@ export default function StandardsLayout({
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              <Link href={`/`}>
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                 <FileCode className="h-5 w-5 text-primary-foreground" />
               </div>
+              </Link>
               <h1 className="text-2xl font-bold">Tome Standards</h1>
             </div>
             <div className="flex items-center gap-2">

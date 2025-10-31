@@ -20,11 +20,12 @@ export interface CBZMetadata {
   volume_number?: number;
   // comic_series fields (uses chapter_number and volume_number)
   // common fields
-  authors: string[];
+  authors?: string[];
   description?: string;
   publisher?: string;
   published_date?: string;
   reading_direction: 'ltr' | 'rtl';
+  layout_direction?: 'horizontal' | 'vertical';
   language: string;
   tags: string[];
 }
@@ -127,11 +128,20 @@ export function generateTomeJson(
   const baseJson: Record<string, any> = {
     type: tomeType,
     title: metadata.title,
-    authors: metadata.authors,
     reading_direction: metadata.reading_direction,
     language: metadata.language,
     tags: metadata.tags,
   };
+
+  // Add layout_direction if provided
+  if (metadata.layout_direction) {
+    baseJson.layout_direction = metadata.layout_direction;
+  }
+
+  // Add authors only if provided
+  if (metadata.authors && metadata.authors.length > 0) {
+    baseJson.authors = metadata.authors;
+  }
 
   // Add optional common fields
   if (metadata.description) {
@@ -218,14 +228,18 @@ export async function createTomeFromCBZ(
 }
 
 export async function downloadTomeFile(zip: JSZip, filename: string): Promise<void> {
+  if (filename.trim() == ".tome") filename = "unknown.tome"
+  if (!filename.endsWith('.tome')) filename = `${filename}.tome`
+
   try {
     const blob = await zip.generateAsync({ type: 'blob' });
 
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename.endsWith('.tome') ? filename : `${filename}.tome`;
-    document.body.appendChild(link);
+    link.download = filename;
+    console.log("Link", link.download)
+     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 

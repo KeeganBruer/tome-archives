@@ -200,9 +200,11 @@ export default function ViewerPage() {
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-                  <Eye className="h-5 w-5 text-muted-foreground" />
-                </div>
+                <Link href={"/tools"}>
+                  <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                    <Eye className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                </Link>
                 <h1 className="text-2xl font-bold">Tome Viewer</h1>
               </div>
               <Link href="/">
@@ -261,9 +263,11 @@ export default function ViewerPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <Eye className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <Link href={`/tools`}>
+                <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                  <Eye className="h-5 w-5 text-primary-foreground" />
+                </div>
+              </Link>
               <h1 className="text-2xl font-bold">Tome Viewer</h1>
               {filename && (
                 <span className="text-sm text-muted-foreground hidden sm:inline">

@@ -3,57 +3,59 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, ChevronRight, ChevronLeft, Download, AlertCircle, Check } from 'lucide-react';
 import {
-  validateCBZFile,
-  extractImagesFromCBZ,
+  validateEPUBFile,
+  getEPUBMetadata,
   generateTomeJson,
-  createTomeFromCBZ,
+  createTomeFromEPUB,
   downloadTomeFile,
   sanitizeFilename,
-  CBZImage,
-  CBZMetadata,
-} from '@/lib/cbzConverter';
-import { TomeErrorDetails } from '@/lib/types';
+} from '@/lib/epubConverter';
+import { TomeErrorDetails, EPUBMetadata, MetadataMode } from '@/lib/types';
 
-type Step = 'upload' | 'metadata' | 'preview' | 'download';
+type Step = 'upload' | 'configure' | 'preview' | 'download';
 
 interface FormData {
   title: string;
-  series: string;
-  volume_number: string;
-  chapter_number: string;
-  comic_title: string;
+  tomeType: string;
+  metadataMode: MetadataMode;
   authors: string[];
   description: string;
   publisher: string;
   published_date: string;
-  reading_direction: 'ltr' | 'rtl';
-  layout_direction: 'horizontal' | 'vertical';
   language: string;
+  layout_direction: 'horizontal' | 'vertical';
   tags: string[];
 }
 
-export default function CBZConverterPage() {
+const STANDARD_TOME_TYPES = [
+  { value: 'epub', label: 'EPUB', description: 'Wrapped EPUB file (default, fully compatible with EPUB readers)' },
+  { value: 'book', label: 'Book', description: 'A complete published book' },
+  { value: 'book_chapter', label: 'Book Chapter', description: 'A single chapter from a book' },
+  { value: 'ebook', label: 'eBook', description: 'Digital book publication' },
+];
+
+export default function EPUBConverterPage() {
   const [currentStep, setCurrentStep] = useState<Step>('upload');
-  const [cbzFile, setCbzFile] = useState<File | null>(null);
-  const [images, setImages] = useState<CBZImage[]>([]);
-  const [tomeType, setTomeType] = useState<'comic_chapter' | 'comic_volume' | 'comic_series'>('comic_chapter');
+  const [epubFile, setEpubFile] = useState<File | null>(null);
+  const [tomeType, setTomeType] = useState<string>('epub');
+  const [metadataMode, setMetadataMode] = useState<MetadataMode>('extracted');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<TomeErrorDetails | null>(null);
-  const [generatedTome, setGeneratedTome] = useState<{ zip: any; filename: string; json: string } | null>(null);
+  const [generatedTome, setGeneratedTome] = useState<{ zip: any; filename: string; json: string; opfPath: string } | null>(null);
+  const [extractedMetadata, setExtractedMetadata] = useState<EPUBMetadata | null>(null);
+  const [isCustomType, setIsCustomType] = useState(false);
+  const [customTomeType, setCustomTomeType] = useState('');
 
   const [formData, setFormData] = useState<FormData>({
     title: '',
-    series: '',
-    volume_number: '1',
-    chapter_number: '1',
-    comic_title: '',
+    tomeType: 'book',
+    metadataMode: 'extracted',
     authors: [],
     description: '',
     publisher: '',
     published_date: '',
-    reading_direction: 'ltr',
-    layout_direction: 'horizontal',
     language: 'en',
+    layout_direction: 'horizontal',
     tags: [],
   });
 
@@ -65,28 +67,35 @@ export default function CBZConverterPage() {
       setError(null);
       setLoading(true);
 
-      // Validate CBZ file
-      await validateCBZFile(file);
+      // Validate EPUB file
+      await validateEPUBFile(file);
 
-      // Extract images
-      const extractedImages = await extractImagesFromCBZ(file);
+      // Extract metadata
+      const epubZip = new (await import('jszip')).default();
+      const loadedZip = await epubZip.loadAsync(file);
+      const metadata = await getEPUBMetadata(loadedZip);
 
-      setCbzFile(file);
-      setImages(extractedImages);
+      setEpubFile(file);
+      setExtractedMetadata(metadata);
 
-      // Auto-fill title from filename
-      const suggestedTitle = sanitizeFilename(file.name);
+      // Auto-fill form data from extracted metadata
       setFormData((prev) => ({
         ...prev,
-        title: suggestedTitle.replace(/-/g, ' '),
+        title: metadata.title,
+        authors: metadata.authors || [],
+        description: metadata.description || '',
+        publisher: metadata.publisher || '',
+        published_date: metadata.published_date || '',
+        language: metadata.language || 'en',
+        tags: metadata.tags || [],
       }));
 
-      setCurrentStep('metadata');
+      setCurrentStep('configure');
     } catch (err) {
       const tomeError = err as TomeErrorDetails;
       setError(tomeError);
-      setCbzFile(null);
-      setImages([]);
+      setEpubFile(null);
+      setExtractedMetadata(null);
     } finally {
       setLoading(false);
     }
@@ -160,55 +169,47 @@ export default function CBZConverterPage() {
       return false;
     }
 
-    if (tomeType === 'comic_chapter' && !formData.comic_title.trim()) {
-      setError({
-        type: 'unknown-error',
-        message: 'Comic title is required for comic_chapter type',
-      });
-      return false;
-    }
-
-    if (tomeType === 'comic_volume' && !formData.series.trim()) {
-      setError({
-        type: 'unknown-error',
-        message: 'Series name is required for comic_volume type',
-      });
-      return false;
-    }
-
     setError(null);
     return true;
   };
 
+  const handlePreviewTome = () => {
+    if (!validateMetadata()) {
+      return;
+    }
+    setCurrentStep('preview');
+  };
+
   const handleGenerateTome = async () => {
     try {
-      if (!validateMetadata()) {
-        return;
-      }
-
       setLoading(true);
       setError(null);
-      if (!cbzFile) {
-        throw new Error('No CBZ file selected');
+
+      if (!epubFile) {
+        throw new Error('No EPUB file selected');
       }
-      const metadata: CBZMetadata = {
+
+      const selectedTomeType = isCustomType ? customTomeType : tomeType;
+
+      const metadata: EPUBMetadata = {
         title: formData.title,
-        chapter_number: tomeType === 'comic_chapter' ? parseInt(formData.chapter_number) : undefined,
-        comic_title: tomeType === 'comic_chapter' ? formData.comic_title : undefined,
-        series: tomeType === 'comic_volume' ? formData.series : undefined,
-        volume_number: tomeType === 'comic_volume' ? parseInt(formData.volume_number) : undefined,
-        authors: formData.authors,
-        description: formData.description,
-        publisher: formData.publisher,
-        published_date: formData.published_date,
-        reading_direction: formData.reading_direction,
-        layout_direction: formData.layout_direction,
+        authors: formData.authors.length > 0 ? formData.authors : undefined,
+        description: formData.description || undefined,
+        publisher: formData.publisher || undefined,
+        published_date: formData.published_date || undefined,
         language: formData.language,
+        layout_direction: formData.layout_direction,
         tags: formData.tags,
       };
 
-      const filename = `${sanitizeFilename(cbzFile.name)}.tome`;
-      const tome = await createTomeFromCBZ(images, metadata, tomeType, filename);
+      const filename = `${sanitizeFilename(epubFile.name)}.tome`;
+      const tome = await createTomeFromEPUB(
+        epubFile,
+        metadata,
+        selectedTomeType,
+        metadataMode,
+        filename
+      );
 
       setGeneratedTome(tome);
       setCurrentStep('download');
@@ -228,6 +229,7 @@ export default function CBZConverterPage() {
       setError(null);
 
       await downloadTomeFile(generatedTome.zip, generatedTome.filename);
+      setCurrentStep('download');
     } catch (err) {
       const tomeError = err as TomeErrorDetails;
       setError(tomeError);
@@ -237,24 +239,25 @@ export default function CBZConverterPage() {
   };
 
   const handleReset = () => {
-    setCbzFile(null);
-    setImages([]);
+    setEpubFile(null);
+    setExtractedMetadata(null);
     setGeneratedTome(null);
     setCurrentStep('upload');
     setError(null);
+    setTomeType('epub');
+    setMetadataMode('extracted');
+    setIsCustomType(false);
+    setCustomTomeType('');
     setFormData({
       title: '',
-      series: '',
-      volume_number: '1',
-      chapter_number: '1',
-      comic_title: '',
+      tomeType: 'epub',
+      metadataMode: 'extracted',
       authors: [],
       description: '',
       publisher: '',
       published_date: '',
-      reading_direction: 'ltr',
-      layout_direction: 'horizontal',
       language: 'en',
+      layout_direction: 'horizontal',
       tags: [],
     });
     setAuthorInput('');
@@ -267,17 +270,17 @@ export default function CBZConverterPage() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
-            currentStep === 'upload' || ['metadata', 'preview', 'download'].includes(currentStep)
+            currentStep === 'upload' || ['configure', 'preview', 'download'].includes(currentStep)
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-muted-foreground'
           }`}>
-            {['metadata', 'preview', 'download'].includes(currentStep) ? <Check className="w-4 h-4" /> : '1'}
+            {['configure', 'preview', 'download'].includes(currentStep) ? <Check className="w-4 h-4" /> : '1'}
           </div>
           <div className={`flex-1 h-1 ${
-            ['metadata', 'preview', 'download'].includes(currentStep) ? 'bg-primary' : 'bg-muted'
+            ['configure', 'preview', 'download'].includes(currentStep) ? 'bg-primary' : 'bg-muted'
           }`} />
           <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
-            currentStep === 'metadata' || ['preview', 'download'].includes(currentStep)
+            currentStep === 'configure' || ['preview', 'download'].includes(currentStep)
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-muted-foreground'
           }`}>
@@ -301,7 +304,7 @@ export default function CBZConverterPage() {
           </div>
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Upload CBZ</span>
+          <span>Upload EPUB</span>
           <span>Configure</span>
           <span>Preview</span>
           <span>Download</span>
@@ -326,15 +329,15 @@ export default function CBZConverterPage() {
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-12 text-center hover:border-primary/50 transition-colors cursor-pointer"
-            onClick={() => document.getElementById('cbz-input')?.click()}
+            onClick={() => document.getElementById('epub-input')?.click()}
           >
             <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Select CBZ File</h3>
-            <p className="text-sm text-muted-foreground mb-4">Drag and drop your CBZ file here or click to browse</p>
+            <h3 className="text-lg font-semibold mb-2">Select EPUB File</h3>
+            <p className="text-sm text-muted-foreground mb-4">Drag and drop your EPUB file here or click to browse</p>
             <input
-              id="cbz-input"
+              id="epub-input"
               type="file"
-              accept=".cbz"
+              accept=".epub"
               onChange={(e) => {
                 if (e.target.files?.[0]) {
                   handleFileSelect(e.target.files[0]);
@@ -347,57 +350,96 @@ export default function CBZConverterPage() {
         </div>
       )}
 
-      {/* Step 2: Configure Metadata */}
-      {currentStep === 'metadata' && (
+      {/* Step 2: Configure */}
+      {currentStep === 'configure' && (
         <div className="space-y-6">
+          {/* Tome Type Selection */}
           <div className="bg-muted/50 border rounded-lg p-6">
             <h3 className="font-semibold mb-4">Tome Type</h3>
+            <div className="space-y-3 mb-4">
+              {STANDARD_TOME_TYPES.map((type) => (
+                <label key={type.value} className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="tomeType"
+                    value={type.value}
+                    checked={!isCustomType && tomeType === type.value}
+                    onChange={(e) => {
+                      setTomeType(e.target.value);
+                      setIsCustomType(false);
+                    }}
+                    className="w-4 h-4"
+                  />
+                  <span>
+                    <div className="font-medium">{type.label}</div>
+                    <div className="text-sm text-muted-foreground">{type.description}</div>
+                  </span>
+                </label>
+              ))}
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="tomeType"
+                  checked={isCustomType}
+                  onChange={() => setIsCustomType(true)}
+                  className="w-4 h-4"
+                />
+                <span>
+                  <div className="font-medium">Custom Type</div>
+                  <div className="text-sm text-muted-foreground">Specify a custom tome type</div>
+                </span>
+              </label>
+            </div>
+
+            {isCustomType && (
+              <input
+                type="text"
+                value={customTomeType}
+                onChange={(e) => setCustomTomeType(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg bg-background"
+                placeholder="Enter custom tome type (e.g., novel, documentation)"
+              />
+            )}
+          </div>
+
+          {/* Metadata Handling Mode */}
+          <div className="bg-muted/50 border rounded-lg p-6">
+            <h3 className="font-semibold mb-4">Metadata Handling</h3>
+            <p className="text-sm text-muted-foreground mb-4">Choose how to handle EPUB metadata:</p>
             <div className="space-y-3">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
-                  name="tomeType"
-                  value="comic_chapter"
-                  checked={tomeType === 'comic_chapter'}
-                  onChange={(e) => setTomeType(e.target.value as 'comic_chapter' | 'comic_volume' | 'comic_series')}
+                  name="metadataMode"
+                  value="extracted"
+                  checked={metadataMode === 'extracted'}
+                  onChange={(e) => setMetadataMode(e.target.value as MetadataMode)}
                   className="w-4 h-4"
                 />
                 <span>
-                  <div className="font-medium">Comic Chapter</div>
-                  <div className="text-sm text-muted-foreground">Single chapter from a webcomic or series</div>
+                  <div className="font-medium">Extracted with Reference</div>
+                  <div className="text-sm text-muted-foreground">Extract metadata into tome.json and include reference to OPF source</div>
                 </span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
-                  name="tomeType"
-                  value="comic_volume"
-                  checked={tomeType === 'comic_volume'}
-                  onChange={(e) => setTomeType(e.target.value as 'comic_chapter' | 'comic_volume' | 'comic_series')}
+                  name="metadataMode"
+                  value="reference"
+                  checked={metadataMode === 'reference'}
+                  onChange={(e) => setMetadataMode(e.target.value as MetadataMode)}
                   className="w-4 h-4"
                 />
                 <span>
-                  <div className="font-medium">Comic Volume</div>
-                  <div className="text-sm text-muted-foreground">Complete single volume or standalone book</div>
-                </span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="tomeType"
-                  value="comic_series"
-                  checked={tomeType === 'comic_series'}
-                  onChange={(e) => setTomeType(e.target.value as 'comic_chapter' | 'comic_volume' | 'comic_series')}
-                  className="w-4 h-4"
-                />
-                <span>
-                  <div className="font-medium">Comic Series</div>
-                  <div className="text-sm text-muted-foreground">Multi-volume collection with chapters.json</div>
+                  <div className="font-medium">Reference Only</div>
+                  <div className="text-sm text-muted-foreground">Point to EPUB OPF metadata without extracting (minimal tome.json)</div>
                 </span>
               </label>
             </div>
           </div>
 
+          {/* Basic Information */}
           <div className="bg-muted/50 border rounded-lg p-6">
             <h3 className="font-semibold mb-4">Basic Information</h3>
             <div className="space-y-4">
@@ -408,84 +450,9 @@ export default function CBZConverterPage() {
                   value={formData.title}
                   onChange={(e) => handleMetadataChange('title', e.target.value)}
                   className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                  placeholder="Comic title"
+                  placeholder="Book title"
                 />
               </div>
-
-              {tomeType === 'comic_chapter' && (
-                <>
-                  <div>
-                    <label className="text-sm font-medium">Comic Title *</label>
-                    <input
-                      type="text"
-                      value={formData.comic_title}
-                      onChange={(e) => handleMetadataChange('comic_title', e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                      placeholder="Parent comic series title"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Chapter Number</label>
-                    <input
-                      type="number"
-                      value={formData.chapter_number}
-                      onChange={(e) => handleMetadataChange('chapter_number', e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                      min="1"
-                    />
-                  </div>
-                </>
-              )}
-
-              {tomeType === 'comic_volume' && (
-                <>
-                  <div>
-                    <label className="text-sm font-medium">Series</label>
-                    <input
-                      type="text"
-                      value={formData.series}
-                      onChange={(e) => handleMetadataChange('series', e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                      placeholder="Series name"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Volume Number</label>
-                    <input
-                      type="number"
-                      value={formData.volume_number}
-                      onChange={(e) => handleMetadataChange('volume_number', e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                      min="1"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Publisher</label>
-                    <input
-                      type="text"
-                      value={formData.publisher}
-                      onChange={(e) => handleMetadataChange('publisher', e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                      placeholder="Publisher name"
-                    />
-                  </div>
-                </>
-              )}
-
-              {tomeType === 'comic_series' && (
-                <>
-                  <div>
-                    <label className="text-sm font-medium">Publisher</label>
-                    <input
-                      type="text"
-                      value={formData.publisher}
-                      onChange={(e) => handleMetadataChange('publisher', e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                      placeholder="Publisher name"
-                    />
-                  </div>
-                </>
-              )}
 
               <div>
                 <label className="text-sm font-medium">Authors</label>
@@ -524,6 +491,7 @@ export default function CBZConverterPage() {
             </div>
           </div>
 
+          {/* Additional Information */}
           <div className="bg-muted/50 border rounded-lg p-6">
             <h3 className="font-semibold mb-4">Additional Information</h3>
             <div className="space-y-4">
@@ -533,12 +501,22 @@ export default function CBZConverterPage() {
                   value={formData.description}
                   onChange={(e) => handleMetadataChange('description', e.target.value)}
                   className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                  placeholder="Synopsis or summary"
+                  placeholder="Book synopsis or summary"
                   rows={3}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Publisher</label>
+                  <input
+                    type="text"
+                    value={formData.publisher}
+                    onChange={(e) => handleMetadataChange('publisher', e.target.value)}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
+                    placeholder="Publisher name"
+                  />
+                </div>
                 <div>
                   <label className="text-sm font-medium">Published Date</label>
                   <input
@@ -547,28 +525,6 @@ export default function CBZConverterPage() {
                     onChange={(e) => handleMetadataChange('published_date', e.target.value)}
                     className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
                   />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Reading Direction</label>
-                  <select
-                    value={formData.reading_direction}
-                    onChange={(e) => handleMetadataChange('reading_direction', e.target.value)}
-                    className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                  >
-                    <option value="ltr">Left to Right</option>
-                    <option value="rtl">Right to Left (Manga)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Layout Direction</label>
-                  <select
-                    value={formData.layout_direction}
-                    onChange={(e) => handleMetadataChange('layout_direction', e.target.value as 'horizontal' | 'vertical')}
-                    className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
-                  >
-                    <option value="horizontal">Horizontal (Books, Manga)</option>
-                    <option value="vertical">Vertical (Webtoons)</option>
-                  </select>
                 </div>
               </div>
 
@@ -587,6 +543,19 @@ export default function CBZConverterPage() {
                     <option value="es">Spanish</option>
                     <option value="zh">Chinese</option>
                     <option value="ko">Korean</option>
+                    <option value="it">Italian</option>
+                    <option value="pt">Portuguese</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Layout Direction</label>
+                  <select
+                    value={formData.layout_direction}
+                    onChange={(e) => handleMetadataChange('layout_direction', e.target.value as 'horizontal' | 'vertical')}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
+                  >
+                    <option value="horizontal">Horizontal (Books, Manga)</option>
+                    <option value="vertical">Vertical (Webtoons)</option>
                   </select>
                 </div>
               </div>
@@ -638,7 +607,7 @@ export default function CBZConverterPage() {
               Back
             </button>
             <button
-              onClick={() => setCurrentStep('preview')}
+              onClick={handlePreviewTome}
               disabled={loading}
               className="flex-1 flex items-center justify-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50"
             >
@@ -650,72 +619,68 @@ export default function CBZConverterPage() {
       )}
 
       {/* Step 3: Preview */}
-      {currentStep === 'preview' && (
+      {currentStep === 'preview' && !generatedTome && (
         <div className="space-y-6">
           <div className="bg-muted/50 border rounded-lg p-6">
-            <h3 className="font-semibold mb-4">Extracted Images ({images.length})</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {images.slice(0, 8).map((image, index) => (
-                <div key={index} className="aspect-square bg-background rounded-lg overflow-hidden border">
-                  <img
-                    src={URL.createObjectURL(new Blob([image.data]))}
-                    alt={`Page ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-              {images.length > 8 && (
-                <div className="aspect-square bg-background rounded-lg border flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-lg font-semibold">+{images.length - 8}</div>
-                    <div className="text-xs text-muted-foreground">more</div>
-                  </div>
+            <h3 className="font-semibold mb-4">Metadata Summary</h3>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium">Title:</span> {formData.title}
+              </div>
+              {formData.authors.length > 0 && (
+                <div>
+                  <span className="font-medium">Authors:</span> {formData.authors.join(', ')}
                 </div>
               )}
+              {formData.publisher && (
+                <div>
+                  <span className="font-medium">Publisher:</span> {formData.publisher}
+                </div>
+              )}
+              {formData.published_date && (
+                <div>
+                  <span className="font-medium">Published:</span> {formData.published_date}
+                </div>
+              )}
+              <div>
+                <span className="font-medium">Language:</span> {formData.language}
+              </div>
+              <div>
+                <span className="font-medium">Layout Direction:</span> {formData.layout_direction}
+              </div>
+              <div>
+                <span className="font-medium">Metadata Mode:</span> {metadataMode}
+              </div>
             </div>
           </div>
 
           <div className="bg-muted/50 border rounded-lg p-6">
-            <h3 className="font-semibold mb-4">Generated tome.json</h3>
-            <pre className="bg-background rounded p-4 text-xs overflow-x-auto max-h-64">
-              <code>{JSON.stringify(generateTomeJson(
-                {
-                  title: formData.title,
-                  chapter_number: tomeType === 'comic_chapter' ? parseInt(formData.chapter_number) : undefined,
-                  comic_title: tomeType === 'comic_chapter' ? formData.comic_title : undefined,
-                  series: formData.series,
-                  authors: formData.authors,
-                  description: formData.description,
-                  publisher: formData.publisher,
-                  published_date: formData.published_date,
-                  reading_direction: formData.reading_direction,
-                  language: formData.language,
-                  tags: formData.tags,
-                },
-                tomeType,
-                images.length
-              ), null, 2)}</code>
-            </pre>
+            <h3 className="font-semibold mb-4">Tome Type & Configuration</h3>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium">Type:</span> {isCustomType ? customTomeType : tomeType}
+              </div>
+              <div>
+                <span className="font-medium">Metadata Handling:</span> {metadataMode}
+              </div>
+            </div>
           </div>
 
           <div className="bg-muted/50 border rounded-lg p-6">
             <h3 className="font-semibold mb-4">Tome Structure</h3>
             <div className="text-sm space-y-2 font-mono">
-              <div>my-comic.tome/</div>
+              <div>my-book.tome/</div>
               <div className="ml-4">├── tome.json</div>
-              <div className="ml-4">└── pages/</div>
-              {images.slice(0, 3).map((image, index) => (
-                <div key={index} className="ml-8">
-                  ├── page-{String(index + 1).padStart(3, '0')}.{image.extension}
-                </div>
-              ))}
-              {images.length > 3 && <div className="ml-8">├── ... ({images.length - 3} more pages)</div>}
+              <div className="ml-4">├── mimetype</div>
+              <div className="ml-4">├── META-INF/</div>
+              <div className="ml-8">└── container.xml</div>
+              <div className="ml-4">└── [EPUB content preserved]</div>
             </div>
           </div>
 
           <div className="flex gap-4">
             <button
-              onClick={() => setCurrentStep('metadata')}
+              onClick={() => setCurrentStep('configure')}
               disabled={loading}
               className="flex items-center gap-2 px-6 py-2 border rounded-lg hover:bg-muted disabled:opacity-50"
             >
@@ -741,13 +706,20 @@ export default function CBZConverterPage() {
             <Check className="w-12 h-12 mx-auto mb-4 text-green-600 dark:text-green-400" />
             <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">Conversion Successful!</h3>
             <p className="text-sm text-green-700 dark:text-green-300 mb-4">
-              Your CBZ file has been converted to Tome format and is ready for download.
+              Your EPUB file has been converted to Tome format and is ready for download.
             </p>
             <div className="bg-background/50 rounded p-3 text-left text-xs font-mono">
               <div>File: {generatedTome.filename}</div>
-              <div>Type: {tomeType}</div>
-              <div>Pages: {images.length}</div>
+              <div>Type: {isCustomType ? customTomeType : tomeType}</div>
+              <div>Metadata Mode: {metadataMode}</div>
             </div>
+          </div>
+
+          <div className="bg-muted/50 border rounded-lg p-6">
+            <h3 className="font-semibold mb-4">Generated tome.json</h3>
+            <pre className="bg-background rounded p-4 text-xs overflow-x-auto max-h-64">
+              <code>{generatedTome.json}</code>
+            </pre>
           </div>
 
           <div className="bg-muted/50 border rounded-lg p-6">

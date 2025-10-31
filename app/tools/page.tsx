@@ -1,0 +1,247 @@
+import Link from 'next/link';
+import { Edit, Eye, Zap, BookMarked, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+export default function ToolsPage() {
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-12 max-w-[1200px]">
+      {/* General Section */}
+      <div>
+        <h2 className="text-2xl font-bold mb-6">General</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Editor */}
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
+                <div className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="h-12 w-12 rounded-lg bg-blue-500 flex items-center justify-center">
+                      <Edit className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-500 text-xs font-medium">
+                      Available
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Tome Editor</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Create and edit .tome files with support for multiple files, metadata management, and rich content organization.
+                    </p>
+                  </div>
+
+                  <ul className="text-xs text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Multi-file project support</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Metadata editor</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>File tree navigation</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>JSON validation</span>
+                    </li>
+                  </ul>
+
+                  <Link href="/tools/editor">
+                    <Button className="w-full">Open Editor</Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Viewer */}
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
+                <div className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="h-12 w-12 rounded-lg bg-purple-500 flex items-center justify-center">
+                      <Eye className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-500 text-xs font-medium">
+                      Available
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Tome Viewer</h3>
+                    <p className="text-sm text-muted-foreground">
+                      View and explore .tome file contents in read-only mode with full file tree navigation.
+                    </p>
+                  </div>
+
+                  <ul className="text-xs text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Read-only file browser</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Preview metadata</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Content inspection</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>JSON visualization</span>
+                    </li>
+                  </ul>
+
+                  <Link href="/tools/viewer">
+                    <Button className="w-full">Open Viewer</Button>
+                  </Link>
+                </div>
+              </div>
+        </div>
+      </div>
+
+      {/* Converters Section */}
+      <div>
+        <h2 className="text-2xl font-bold mb-6">Converters</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* CBZ Converter */}
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
+                <div className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="h-12 w-12 rounded-lg bg-blue-500 flex items-center justify-center">
+                      <Zap className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-500 text-xs font-medium">
+                      Available
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">CBZ Converter</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Convert CBZ (comic book archive) files to .tome format with comprehensive metadata support.
+                    </p>
+                  </div>
+
+                  <ul className="text-xs text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Multi-type support (chapter, volume, series)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Reading direction support</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Page-level metadata</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Live preview</span>
+                    </li>
+                  </ul>
+
+                  <Link href="/tools/converters/cbz">
+                    <Button className="w-full">Open Converter</Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* EPUB Converter */}
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
+                <div className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="h-12 w-12 rounded-lg bg-purple-500 flex items-center justify-center">
+                      <BookMarked className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-500 text-xs font-medium">
+                      Available
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">EPUB Converter</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Wrap EPUB files in .tome format while preserving full EPUB compatibility.
+                    </p>
+                  </div>
+
+                  <ul className="text-xs text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Non-destructive wrapping</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Metadata extraction</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Flexible metadata handling</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Custom type selection</span>
+                    </li>
+                  </ul>
+
+                  <Link href="/tools/converters/epub">
+                    <Button className="w-full">Open Converter</Button>
+                  </Link>
+                </div>
+              </div>
+        </div>
+      </div>
+
+      {/* Scrapers Section */}
+      <div>
+        <h2 className="text-2xl font-bold mb-6">Scrapers</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Web Scraper */}
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
+                <div className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="h-12 w-12 rounded-lg bg-orange-500 flex items-center justify-center">
+                      <Globe className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="px-2 py-1 rounded-md bg-amber-500/10 text-amber-600 text-xs font-medium">
+                      Coming Soon
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Web Scraper</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Extract content from websites and convert them into structured .tome archives.
+                    </p>
+                  </div>
+
+                  <ul className="text-xs text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>URL-based content extraction</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Markdown conversion</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Asset preservation</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Batch processing</span>
+                    </li>
+                  </ul>
+
+                  <Button className="w-full" disabled>
+                    Coming Soon
+                  </Button>
+                </div>
+              </div>
+        </div>
+      </div>
+    </div>
+  );
+}

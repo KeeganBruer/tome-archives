@@ -1,4 +1,6 @@
-import { Archive, BookOpen, CheckCircle, Circle, FileJson, FileImage, Zap } from 'lucide-react';
+import Link from 'next/link';
+import { Archive, BookOpen, CheckCircle, Circle, FileJson, FileImage, Zap, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function CBZPage() {
   return (
@@ -14,6 +16,23 @@ export default function CBZPage() {
       </div>
 
       <div className="space-y-8">
+        {/* Quick Convert Section */}
+        <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-blue-900 dark:text-blue-100">
+            <Zap className="h-5 w-5" />
+            Want to Convert Your CBZ Files?
+          </h2>
+          <p className="text-sm text-blue-900 dark:text-blue-100 mb-4">
+            Use our automated CBZ Converter tool to transform your CBZ files into standardized comic tome archives in minutes!
+          </p>
+          <Link href="/tools/converters/cbz">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              Open CBZ Converter
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
+        </div>
+
         {/* Overview */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Overview</h2>
@@ -347,6 +366,91 @@ export default function CBZPage() {
               <p className="text-sm text-muted-foreground">
                 Create pages.json for better reader integration, especially if you have information about double-spreads or special pages.
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Benefits Summary */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Why Convert to .Tome Format?</h2>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Converting your CBZ files to .tome format unlocks modern features while maintaining full compatibility with existing comic readers:
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Benefit 1 */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Standardized Metadata
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Move beyond CBZ's lack of metadata standards. Define authors, publication dates, reading direction, and chapter information in a structured, discoverable format.
+                </p>
+              </div>
+
+              {/* Benefit 2 */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Reading Direction Support
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Explicitly define left-to-right or right-to-left reading direction. No more guessing for manga or international comics.
+                </p>
+              </div>
+
+              {/* Benefit 3 */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Better Organization
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Store chapter and volume information directly in metadata. Build searchable comic libraries with proper hierarchical organization.
+                </p>
+              </div>
+
+              {/* Benefit 4 */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Future-Proof Format
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Use a versioned standard that's built to last. Preserve your comics for decades with a documented, extensible format specification.
+                </p>
+              </div>
+
+              {/* Benefit 5 */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Enhanced Reader Integration
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Optional pages.json enables page-level metadata. Mark special pages (covers, double-spreads) and provide richer reading experiences.
+                </p>
+              </div>
+
+              {/* Benefit 6 */}
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Unified Library Format
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Mix comics (CBZ) and books (EPUB) in the same standardized archive format. Manage your entire digital media collection uniformly.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/standards/types/comic_chapter">
+                <Button variant="outline" className="w-full sm:w-auto">
+                  View Comic Type Standard
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

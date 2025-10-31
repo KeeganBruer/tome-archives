@@ -84,3 +84,35 @@ export interface TomeTemplate {
 export interface TemplateConfig {
   templates: TomeTemplate[];
 }
+
+export interface EPUBMetadata {
+  title: string;
+  authors?: string[];
+  publisher?: string;
+  published_date?: string;
+  description?: string;
+  language: string;
+  layout_direction?: 'horizontal' | 'vertical';
+  tags: string[];
+  cover_image?: string;
+}
+
+export type MetadataMode = 'extracted' | 'reference' | 'both';
+
+export type LayoutDirection = 'horizontal' | 'vertical';
+
+export interface CBZMetadata {
+  title: string;
+  chapter_number?: number;
+  comic_title?: string;
+  series?: string;
+  volume_number?: number;
+  authors?: string[];
+  description?: string;
+  publisher?: string;
+  published_date?: string;
+  reading_direction: 'ltr' | 'rtl';
+  layout_direction?: 'horizontal' | 'vertical';
+  language: string;
+  tags: string[];
+}

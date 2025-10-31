@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FileArchive, Edit, Eye, FileCode, Package, Layers, CheckCircle, BookOpen, FileImage, Zap } from 'lucide-react';
+import { FileArchive, Edit, Eye, FileCode, Package, Layers, CheckCircle, BookOpen, FileImage, Zap, Globe, BookMarked } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Home() {
@@ -9,9 +9,11 @@ export default function Home() {
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-              <FileArchive className="h-6 w-6 text-primary-foreground" />
-            </div>
+            <Link href={`/`}>
+              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
+                <FileArchive className="h-6 w-6 text-primary-foreground" />
+              </div>
+            </Link>
             <div>
               <h1 className="text-3xl font-bold">Tome Trove</h1>
               <p className="text-sm text-muted-foreground">Tools for working with .tome files</p>
@@ -79,20 +81,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* File Structure Example */}
-              <div className="mt-8 bg-card rounded-lg p-6 border">
-                <h4 className="font-semibold mb-4">Structure Example</h4>
-                <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm space-y-1">
-                  <div className="text-muted-foreground">my-project.tome (ZIP archive)</div>
-                  <div className="ml-4">├── tome.json <span className="text-muted-foreground">← Required metadata</span></div>
-                  <div className="ml-4">├── README.md</div>
-                  <div className="ml-4">├── docs/</div>
-                  <div className="ml-8">│   ├── getting-started.md</div>
-                  <div className="ml-8">│   └── api.md</div>
-                  <div className="ml-4">└── assets/</div>
-                  <div className="ml-8">    └── logo.png</div>
-                </div>
-              </div>
+              
             </div>
           </div>
         </section>
@@ -353,17 +342,14 @@ export default function Home() {
           <div className="max-w-6xl mx-auto">
             <h3 className="text-2xl font-bold mb-8 text-center">Available Tools</h3>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Editor Card */}
-              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
-                <div className="p-6 space-y-4">
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors flex">
+                <div className="p-6 space-y-4 flex-1 flex flex-col">
                   <div className="flex items-start justify-between">
                     <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
                       <Edit className="h-6 w-6 text-primary-foreground" />
                     </div>
-                    <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-500 text-xs font-medium">
-                      Available
-                    </span>
                   </div>
 
                   <div>
@@ -392,7 +378,7 @@ export default function Home() {
                       <span>Browser-based, no server upload required</span>
                     </li>
                   </ul>
-
+                  <div className='flex-1'></div>
                   <Link href="/tools/editor">
                     <Button className="w-full">
                       Open Editor
@@ -402,15 +388,12 @@ export default function Home() {
               </div>
 
               {/* Viewer Card */}
-              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
-                <div className="p-6 space-y-4">
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors flex">
+                <div className="p-6 space-y-4 flex-1 flex flex-col">
                   <div className="flex items-start justify-between">
                     <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center">
                       <Eye className="h-6 w-6 text-primary-foreground" />
                     </div>
-                    <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-500 text-xs font-medium">
-                      Available
-                    </span>
                   </div>
 
                   <div>
@@ -439,7 +422,7 @@ export default function Home() {
                       <span>Browser-based, no server upload required</span>
                     </li>
                   </ul>
-
+                  <div className='flex-1'></div>
                   <Link href="/tools/viewer">
                     <Button className="w-full">
                       Open Viewer
@@ -449,15 +432,12 @@ export default function Home() {
               </div>
 
               {/* CBZ Converter Card */}
-              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors">
-                <div className="p-6 space-y-4">
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors flex">
+                <div className="p-6 space-y-4 flex-1 flex flex-col">
                   <div className="flex items-start justify-between">
                     <div className="h-12 w-12 rounded-lg bg-blue-500 flex items-center justify-center">
                       <Zap className="h-6 w-6 text-white" />
                     </div>
-                    <span className="px-2 py-1 rounded-md bg-green-500/10 text-green-500 text-xs font-medium">
-                      Available
-                    </span>
                   </div>
 
                   <div>
@@ -486,10 +466,98 @@ export default function Home() {
                       <span>Live preview before download</span>
                     </li>
                   </ul>
-
+                  <div className='flex-1'></div>
                   <Link href="/tools/converters/cbz">
                     <Button className="w-full">
                       Open Converter
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* EPUB Converter Card */}
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors flex">
+                <div className="p-6 space-y-4 flex-1 flex flex-col">
+                  <div className="flex items-start justify-between">
+                    <div className="h-12 w-12 rounded-lg bg-purple-500 flex items-center justify-center">
+                      <BookMarked className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xl font-semibold mb-2">EPUB Converter</h4>
+                    <p className="text-muted-foreground">
+                      Wrap EPUB files in .tome format, preserving original content while
+                      adding standardized metadata to conform to the .tome standard.
+                    </p>
+                  </div>
+
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Non-destructive EPUB wrapping</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Automatic metadata extraction from OPF</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Flexible metadata handling (extract, reference, or both)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Custom tome type selection</span>
+                    </li>
+                  </ul>
+                  <div className='flex-1'></div>
+                  <Link href="/tools/converters/epub">
+                    <Button className="w-full">
+                      Open Converter
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Web Scraper Card */}
+              <div className="bg-card rounded-lg border overflow-hidden hover:border-primary/50 transition-colors flex">
+                <div className="p-6 space-y-4 flex-1 flex flex-col">
+                  <div className="flex items-start justify-between">
+                    <div className="h-12 w-12 rounded-lg bg-orange-500 flex items-center justify-center">
+                      <Globe className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xl font-semibold mb-2">Web Scraper</h4>
+                    <p className="text-muted-foreground">
+                      Scrape web content and automatically generate .tome files
+                      with extracted metadata and formatted content.
+                    </p>
+                  </div>
+
+                  <ul className="text-sm text-muted-foreground space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Extract webpage content and metadata</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Automatic title and description parsing</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Preview before .tome generation</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      <span>Direct download as .tome archive</span>
+                    </li>
+                  </ul>
+                  <div className='flex-1'></div>
+                  <Link href="/tools/webscraper">
+                    <Button className="w-full">
+                      Open Scraper
                     </Button>
                   </Link>
                 </div>
