@@ -11,7 +11,7 @@ export default function CBZPage() {
           CBZ to Tome Conversion
         </div>
         <p className="text-muted-foreground">
-          Learn how to convert traditional CBZ (Comic Book ZIP) files into modern comic_chapter tome archives for better interoperability and metadata support.
+          Learn how to convert traditional CBZ (Comic Book ZIP) files into modern tome archives for better interoperability and metadata support.
         </p>
       </div>
 
@@ -23,7 +23,7 @@ export default function CBZPage() {
             Want to Convert Your CBZ Files?
           </h2>
           <p className="text-sm text-blue-900 dark:text-blue-100 mb-4">
-            Use our automated CBZ Converter tool to transform your CBZ files into standardized comic tome archives in minutes!
+            Use our automated CBZ Converter tool to transform your CBZ files into standardized comic tome archives!
           </p>
           <Link href="/tools/converters/cbz">
             <Button className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -41,7 +41,7 @@ export default function CBZPage() {
               CBZ files are standard ZIP archives containing comic book images, typically used by readers like ComiXology and Calibre. While CBZ is a ubiquitous format, it lacks standardized metadata support and reading direction information.
             </p>
             <p className="text-sm text-muted-foreground">
-              By converting CBZ files to comic_chapter tome format, you gain:
+              By converting CBZ files to tome format, you gain:
             </p>
             <ul className="text-sm text-muted-foreground space-y-2 ml-4">
               <li className="flex items-start gap-2">
@@ -195,107 +195,65 @@ export default function CBZPage() {
             <FileJson className="h-5 w-5 text-primary" />
             Metadata Reference
           </h2>
-          <div className="space-y-6">
-            {/* Required Fields */}
-            <div>
-              <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                Required Fields
-              </h3>
-              <div className="space-y-3">
-                <div className="border-l-2 border-primary pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">type</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Must be <code className="bg-background px-1.5 py-0.5 rounded">&quot;comic_chapter&quot;</code>
-                  </p>
-                </div>
-                <div className="border-l-2 border-primary pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">title</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    The chapter title (derived from CBZ filename or metadata if available)
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="bg-muted/50 border rounded-lg p-6 space-y-4">
+            <p className="text-sm text-muted-foreground">
+              The metadata fields available for your tome depend on the content type you choose. The Tome format supports different type standards, each with its own set of required and optional fields.
+            </p>
+            <p className="text-sm text-muted-foreground font-semibold">
+              Select your content type below to view the complete metadata specification:
+            </p>
 
-            {/* Recommended Fields */}
-            <div>
-              <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                <Zap className="h-4 w-4 text-amber-600" />
-                Recommended Fields
-              </h3>
-              <div className="space-y-3">
-                <div className="border-l-2 border-amber-500 pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">chapter_number</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Sequential chapter number for ordering
+            <div className="grid md:grid-cols-3 gap-4 mt-4">
+              {/* Comic Series Type */}
+              <Link href="/standards/types/comic_series">
+                <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer h-full">
+                  <div className="flex items-start gap-3 mb-3">
+                    <BookOpen className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                    <h3 className="font-semibold">Comic Series</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    For complete comic series with multiple volumes and chapters. Includes volume and chapter organization metadata.
                   </p>
+                  <div className="flex items-center text-primary text-xs font-semibold">
+                    View Specification
+                    <ArrowRight className="h-3 w-3 ml-2" />
+                  </div>
                 </div>
-                <div className="border-l-2 border-amber-500 pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">comic_title</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Title of the parent series/comic
-                  </p>
-                </div>
-                <div className="border-l-2 border-amber-500 pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">authors</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Array of creator names (artist, writer, etc.)
-                  </p>
-                </div>
-                <div className="border-l-2 border-amber-500 pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">reading_direction</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    <code className="bg-background px-1.5 py-0.5 rounded">&quot;ltr&quot;</code> (left-to-right, default) or <code className="bg-background px-1.5 py-0.5 rounded">&quot;rtl&quot;</code> (right-to-left for manga)
-                  </p>
-                </div>
-                <div className="border-l-2 border-amber-500 pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">page_count</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Total number of pages in the chapter
-                  </p>
-                </div>
-              </div>
-            </div>
+              </Link>
 
-            {/* Optional Fields */}
-            <div>
-              <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                <Circle className="h-4 w-4 text-muted-foreground" />
-                Optional Fields
-              </h3>
-              <div className="space-y-3">
-                <div className="border-l-2 border-muted pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">description</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Chapter synopsis or summary
+              {/* Comic Volume Type */}
+              <Link href="/standards/types/comic_volume">
+                <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer h-full">
+                  <div className="flex items-start gap-3 mb-3">
+                    <BookOpen className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                    <h3 className="font-semibold">Comic Volume</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    For individual volumes or collected graphic novels. Perfect for published manga volumes or comic collections.
                   </p>
+                  <div className="flex items-center text-primary text-xs font-semibold">
+                    View Specification
+                    <ArrowRight className="h-3 w-3 ml-2" />
+                  </div>
                 </div>
-                <div className="border-l-2 border-muted pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">cover_image</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Path to cover image (typically first page)
+              </Link>
+
+              {/* Comic Chapter Type */}
+              <Link href="/standards/types/comic_chapter">
+                <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer h-full">
+                  <div className="flex items-start gap-3 mb-3">
+                    <BookOpen className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                    <h3 className="font-semibold">Comic Chapter</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    For individual chapters or standalone comic stories. Ideal for webcomics and serialized releases.
                   </p>
+                  <div className="flex items-center text-primary text-xs font-semibold">
+                    View Specification
+                    <ArrowRight className="h-3 w-3 ml-2" />
+                  </div>
                 </div>
-                <div className="border-l-2 border-muted pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">published_date</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    ISO 8601 format (YYYY-MM-DD)
-                  </p>
-                </div>
-                <div className="border-l-2 border-muted pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">language</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    ISO 639-1 language code (en, es, ja, etc.)
-                  </p>
-                </div>
-                <div className="border-l-2 border-muted pl-4">
-                  <code className="text-sm font-mono bg-muted px-2 py-1 rounded">tags</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Array of genre/category tags
-                  </p>
-                </div>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -385,7 +343,7 @@ export default function CBZPage() {
                   Standardized Metadata
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Move beyond CBZ's lack of metadata standards. Define authors, publication dates, reading direction, and chapter information in a structured, discoverable format.
+                  Move beyond CBZ&apos;s lack of metadata standards. Define authors, publication dates, reading direction, and chapter information in a structured, discoverable format.
                 </p>
               </div>
 
@@ -418,7 +376,7 @@ export default function CBZPage() {
                   Future-Proof Format
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Use a versioned standard that's built to last. Preserve your comics for decades with a documented, extensible format specification.
+                  Use a versioned standard that&apos;s built to last. Preserve your comics for decades with a documented, extensible format specification.
                 </p>
               </div>
 

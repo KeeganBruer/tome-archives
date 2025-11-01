@@ -46,16 +46,14 @@ export default function FileStructurePage() {
                 <code className="text-sm font-mono bg-background px-2 py-1 rounded">tome.json</code>
                 <p className="text-sm text-muted-foreground mt-2">
                   Must be located at the root of the archive. This file contains the metadata and type information
-                  for the tome. At minimum, it must include a <code className="bg-background px-1.5 py-0.5 rounded">type</code> field
-                  and a <code className="bg-background px-1.5 py-0.5 rounded">title</code> field.
+                  for the tome. At minimum, it must include a <code className="bg-background px-1.5 py-0.5 rounded">type</code> field.
                 </p>
               </div>
             </div>
             <div className="mt-4 bg-background rounded border p-3">
               <pre className="text-xs font-mono overflow-x-auto">
                 <code>{`{
-  "type": "book",
-  "title": "Example Book"
+  "type": "book"
 }`}</code>
               </pre>
             </div>
@@ -99,36 +97,6 @@ export default function FileStructurePage() {
                   <div className="ml-8">    └── info.txt</div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Optional Standard Files */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Optional Standard Files</h2>
-          <div className="space-y-3">
-            <div className="border-l-4 border-primary pl-4">
-              <code className="text-sm font-mono bg-muted px-2 py-1 rounded">pages.json</code>
-              <p className="text-sm text-muted-foreground mt-2">
-                Defines page order and metadata for comics and comic chapters. Each entry specifies the file path,
-                page number, dimensions, and type.
-              </p>
-            </div>
-
-            <div className="border-l-4 border-primary pl-4">
-              <code className="text-sm font-mono bg-muted px-2 py-1 rounded">chapters.json</code>
-              <p className="text-sm text-muted-foreground mt-2">
-                Defines chapter markers for audiobooks. Each entry includes the chapter title, audio file path,
-                start time, and duration.
-              </p>
-            </div>
-
-            <div className="border-l-4 border-primary pl-4">
-              <code className="text-sm font-mono bg-muted px-2 py-1 rounded">table-of-contents.json</code>
-              <p className="text-sm text-muted-foreground mt-2">
-                Optional table of contents for books and other text-based content. Provides navigation structure
-                with links to content sections.
-              </p>
             </div>
           </div>
         </div>

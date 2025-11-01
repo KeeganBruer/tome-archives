@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeft,Archive, FileCode, FolderTree, Link as LinkIcon, ChevronRight, BookOpen, FileImage, Headphones, BookImage, Menu, X, BookMarked } from 'lucide-react';
+import { ArrowLeft,Archive, FileCode, FolderTree, Link as LinkIcon, ChevronRight, BookOpen, FileImage, Headphones, BookImage, Menu, X, BookMarked, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function StandardsLayout({
@@ -19,6 +19,21 @@ export default function StandardsLayout({
 
   const sidebarContent = (
     <>
+      {/* Introduction */}
+      <Link href="/standards">
+        <button
+          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
+            isActive('/standards')
+              ? 'bg-primary text-primary-foreground'
+              : 'hover:bg-accent'
+          }`}
+          onClick={() => setIsMobileSidebarOpen(false)}
+        >
+          <Lightbulb className="h-4 w-4 flex-shrink-0" />
+          <span className="text-sm font-medium">Introduction</span>
+        </button>
+      </Link>
+
       {/* File Structure */}
       <Link href="/standards/file-structure">
         <button
@@ -118,17 +133,30 @@ export default function StandardsLayout({
               </button>
             </Link>
 
-            <Link href="/standards/types/comic">
+            <Link href="/standards/types/comic_series">
               <button
                 className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-                  isActive('/standards/types/comic')
+                  isActive('/standards/types/comic_series')
                     ? 'bg-primary text-primary-foreground'
                     : 'hover:bg-accent'
                 }`}
                 onClick={() => setIsMobileSidebarOpen(false)}
               >
                 <BookImage className="h-3.5 w-3.5 flex-shrink-0" />
-                <span className="text-sm">comic</span>
+                <span className="text-sm">comic_series</span>
+              </button>
+            </Link>
+            <Link href="/standards/types/comic_volume">
+              <button
+                className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+                  isActive('/standards/types/comic_volume')
+                    ? 'bg-primary text-primary-foreground'
+                    : 'hover:bg-accent'
+                }`}
+                onClick={() => setIsMobileSidebarOpen(false)}
+              >
+                <BookImage className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="text-sm">comic_volume</span>
               </button>
             </Link>
 
@@ -218,12 +246,6 @@ export default function StandardsLayout({
               >
                 {isMobileSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
               </Button>
-              <Link href="/">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="hidden sm:inline">Back to Home</span>
-                </Button>
-              </Link>
             </div>
           </div>
         </div>

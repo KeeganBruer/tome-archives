@@ -13,7 +13,31 @@ export default function LinkingPage() {
         </p>
       </div>
 
-      <div className="space-y-8">
+      
+        {/* Root-Relative Paths */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <ArrowUpRight className="h-5 w-5 text-primary" />
+            Root-Relative Paths
+          </h2>
+          <div className="bg-muted/50 border rounded-lg p-6">
+            <p className="text-sm text-muted-foreground mb-4">
+              Paths starting with a forward slash (<code className="bg-background px-1.5 py-0.5 rounded">/</code>) are
+              considered root-relative and always resolve from the root of the tome archive.
+            </p>
+
+            <div className="bg-background rounded border p-3 text-xs font-mono space-y-2">
+              <div>
+                <div className="text-primary">&quot;/images/cover.jpg&quot;</div>
+              </div>
+              <div>
+                <div className="text-primary">&quot;/content/chapter1.html&quot;</div>
+              </div>
+            </div>
+
+            
+          </div>
+        </div>
         {/* Relative Links */}
         <div>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -23,25 +47,34 @@ export default function LinkingPage() {
           <div className="bg-muted/50 border rounded-lg p-6">
             <p className="text-sm text-muted-foreground mb-4">
               Links that don&apos;t start with a protocol (like <code className="bg-background px-1.5 py-0.5 rounded">http://</code>) or
-              domain name are treated as relative paths within the tome archive. These links always resolve from the
-              root of the archive.
+              a root path &apos;/&apos; are treated as relative paths within the tome archive. These links resolve from the path of the refering file.
             </p>
-
+            <div className="mt-4 mb-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
+              <p className="text-xs text-blue-900 dark:text-blue-100">
+                <strong>Note:</strong> Relative links can also start with a &apos;./&apos;
+              </p>
+            </div>
             <div className="space-y-3">
               <div>
+                <h4 className="font-medium text-sm mb-2">Given the referencing file:</h4>
+                <div className="bg-background rounded border p-3 text-xs font-mono space-y-2">
+                  <div>
+                    <div className="text-primary">&quot;/path/to/content/config.json&quot;</div>
+                  </div>
+                </div>
                 <h4 className="font-medium text-sm mb-2">Examples:</h4>
                 <div className="bg-background rounded border p-3 text-xs font-mono space-y-2">
                   <div>
-                    <span className="text-muted-foreground">{'//'} Links to content.html at the archive root</span>
-                    <div className="text-primary">&quot;content.html&quot;</div>
+                    <div className="text-primary">&quot;content.html&quot; {"=>"} &quot;<span className="text-muted-foreground">/path/to/content/</span>content.html&quot;</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">{'//'} Links to page-01.jpg inside the pages directory</span>
-                    <div className="text-primary">&quot;pages/page-01.jpg&quot;</div>
+                    <div className="text-primary">&quot;pages/page-01.jpg&quot; {"=>"} &quot;<span className="text-muted-foreground">/path/to/content/</span>pages/page-01.jpg&quot;</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">{'//'} Links to style.css inside the assets/css directory</span>
-                    <div className="text-primary">&quot;assets/css/style.css&quot;</div>
+                    <div className="text-primary">&quot;assets/css/style.css&quot; {"=>"} &quot;<span className="text-muted-foreground">/path/to/content/</span>assets/css/style.css&quot;</div>
+                  </div>
+                  <div>
+                    <div className="text-primary">&quot;./images/image1.png&quot; {"=>"} &quot;<span className="text-muted-foreground">/path/to/content/</span>images/image1.png&quot;</div>
                   </div>
                 </div>
               </div>
@@ -49,6 +82,33 @@ export default function LinkingPage() {
           </div>
         </div>
 
+        {/* Parent Directory References */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Parent Directory References</h2>
+          <div className="bg-muted/50 border rounded-lg p-6">
+            <p className="text-sm text-muted-foreground mb-4">
+              You can use <code className="bg-background px-1.5 py-0.5 rounded">../</code> to reference parent directories.
+            </p>
+
+            <div className="bg-background rounded border p-3 text-xs font-mono space-y-2">
+              <div>
+                <div className="text-primary">&quot;../images/pic.jpg&quot;</div>
+                <span className="text-muted-foreground">{'//'} From &quot;content/chapter1.html&quot;, links to &quot;images/pic.jpg&quot;</span>
+              </div>
+              <div>
+                <div className="text-primary">&quot;../toc.html&quot;</div>
+                <span className="text-muted-foreground">{'//'} From &quot;content/parts/part1.html&quot;, links to &quot;content/toc.html&quot;</span>
+              </div>
+            </div>
+
+            <div className="mt-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-4">
+              <p className="text-xs text-red-900 dark:text-red-100">
+                <strong>Important:</strong> Links cannot exceed the archive root. Any path that attempts to reference a file outside the tome file (e.g., <code className="bg-red-100 dark:bg-red-900 px-1 py-0.5 rounded">../../outside.txt</code>) will always return <code className="bg-red-100 dark:bg-red-900 px-1 py-0.5 rounded">null</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-8">
         {/* External Links */}
         <div>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -104,69 +164,6 @@ export default function LinkingPage() {
           </div>
         </div>
 
-        {/* Root-Relative Paths */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <ArrowUpRight className="h-5 w-5 text-primary" />
-            Root-Relative Paths
-          </h2>
-          <div className="bg-muted/50 border rounded-lg p-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              Paths starting with a forward slash (<code className="bg-background px-1.5 py-0.5 rounded">/</code>) are
-              considered root-relative and always resolve from the root of the tome archive.
-            </p>
-
-            <div className="bg-background rounded border p-3 text-xs font-mono space-y-2">
-              <div>
-                <span className="text-muted-foreground">{'//'} Same as &quot;images/cover.jpg&quot;</span>
-                <div className="text-primary">&quot;/images/cover.jpg&quot;</div>
-              </div>
-              <div>
-                <span className="text-muted-foreground">{'//'} Same as &quot;content/chapter1.html&quot;</span>
-                <div className="text-primary">&quot;/content/chapter1.html&quot;</div>
-              </div>
-            </div>
-
-            <div className="mt-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
-              <p className="text-xs text-blue-900 dark:text-blue-100">
-                <strong>Note:</strong> Since all relative links resolve from the archive root, there&apos;s usually
-                no practical difference between paths with and without a leading slash. However, using the leading
-                slash can make it clearer that you&apos;re referencing from the root.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Parent Directory References */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Parent Directory References</h2>
-          <div className="bg-muted/50 border rounded-lg p-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              You can use <code className="bg-background px-1.5 py-0.5 rounded">../</code> to reference parent directories,
-              though this is less common since all paths resolve from the root.
-            </p>
-
-            <div className="bg-background rounded border p-3 text-xs font-mono space-y-2">
-              <div>
-                <span className="text-muted-foreground">{'//'} From &quot;content/chapter1.html&quot;, links to &quot;images/pic.jpg&quot;</span>
-                <div className="text-primary">&quot;../images/pic.jpg&quot;</div>
-              </div>
-              <div>
-                <span className="text-muted-foreground">{'//'} From &quot;content/parts/part1.html&quot;, links to &quot;content/toc.html&quot;</span>
-                <div className="text-primary">&quot;../toc.html&quot;</div>
-              </div>
-            </div>
-
-            <div className="mt-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-4">
-              <p className="text-xs text-amber-900 dark:text-amber-100">
-                <strong>Best Practice:</strong> For clarity and simplicity, prefer using paths from the root
-                (e.g., <code className="bg-background px-1.5 py-0.5 rounded">&quot;images/pic.jpg&quot;</code>) rather than relative
-                parent references.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Link Resolution Summary */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Link Resolution Summary</h2>
@@ -183,22 +180,27 @@ export default function LinkingPage() {
                 <tr className="border-b">
                   <td className="p-3 font-mono text-xs">content.html</td>
                   <td className="p-3 text-sm text-muted-foreground">Relative</td>
-                  <td className="p-3 text-sm text-muted-foreground">File in archive root</td>
+                  <td className="p-3 text-sm text-muted-foreground">From the referencing file&apos;s directory</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-3 font-mono text-xs">./content.html</td>
+                  <td className="p-3 text-sm text-muted-foreground">Relative (explicit)</td>
+                  <td className="p-3 text-sm text-muted-foreground">Explicitly from the current directory (same as above)</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-3 font-mono text-xs">pages/page-01.jpg</td>
                   <td className="p-3 text-sm text-muted-foreground">Relative</td>
-                  <td className="p-3 text-sm text-muted-foreground">File in pages/ directory</td>
+                  <td className="p-3 text-sm text-muted-foreground">Subdirectory from the referencing file&apos;s directory</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-3 font-mono text-xs">/images/cover.jpg</td>
                   <td className="p-3 text-sm text-muted-foreground">Root-relative</td>
-                  <td className="p-3 text-sm text-muted-foreground">File in images/ directory</td>
+                  <td className="p-3 text-sm text-muted-foreground">Always from the archive root</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-3 font-mono text-xs">../assets/style.css</td>
                   <td className="p-3 text-sm text-muted-foreground">Parent-relative</td>
-                  <td className="p-3 text-sm text-muted-foreground">File in parent&apos;s assets/ directory</td>
+                  <td className="p-3 text-sm text-muted-foreground">From the parent directory of the referencing file</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-3 font-mono text-xs">https://example.com</td>
